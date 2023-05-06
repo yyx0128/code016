@@ -1,36 +1,104 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+#include<stdio.h>
+#include<iostream>
+#include<fstream>
+#include<string>
+#define MAX 10000
+using namespace std;
+int num;
+struct node
+{
+	char data[3];
+	node* next;
+	node():next(NULL){}
+};
+node* create(string read,int len)
+{
+	node* head = new node, * pre = head, * p;
+	int n = 0;
+	while (n<len)
+	{
+		p = new node;
+		char sign[3];
+		if (read[n] < 0)//编码是负数，接下来的两位是一个汉字
+		{
+			sign[0] = read[n];
+			sign[1] = read[n + 1];
+			sign[2] = '\0';
+			n += 2;
+		}
+		else
+		{
+			sign[0] = read[n];
+			sign[1] = '\0';
+			n++;
+		}
+		strcpy_s(p->data, sign);
+		cout << p->data;
+		pre->next = p;
+		pre = p;
+		num++;
+	}
+	return head;
+}
+int Visited[MAX];
+void operate(node* head)
+{
+	node* p = head->next, * q, * qre;
+	while (p)
+	{
+		qre = p;
+		q = qre->next;
+		while (q)
+		{
+			if (0 == strcmp(p->data, q->data))
+			{
+				qre->next = q->next;
+				q = qre->next;
+			}
+			else
+			{
+				qre = q;
+				q = q->next;
+			}
+		}
+		p = p->next;
+	}
+}
+void Sum(node* head)
+{
+	node* p = head->next;
+	int n = 0;
+	while (p)
+	{
+		n++;
+		if(n%2==0)cout << n << p->data << "               ";
+		else if(n%3==0)cout << n << p->data << "             ";
+		else
+			cout <<n<< p->data << endl;
+		p = p->next;
+	}
+	cout <<endl<< "如上述输出结果，本文本共"<<n<<"个不同的汉字和标点。";
+}
+void menu()
+{
+	cout << "*********************************************************" << endl;
+	cout << "                  文本内容统计系统                     " << endl;
+	cout << "                  1.自动读取文本信息                   " << endl;
+	cout << "                  2.对文本信息统计                   " << endl;
+	cout << "                  3.输出统计结果                 " << endl;
+	cout << "*********************************************************" << endl;
+}
+int main()
+{
+	ifstream ifs("009.txt");
+	menu();
+	streambuf* oldbuffer = cin.rdbuf(ifs.rdbuf());
+	string read;
+	cin >> read;
+	cout << "文字内容为：" << endl;
+	node*head=create(read, read.size());
+	cout << endl;
+	operate(head);
+	cout << endl;
+	Sum(head);
+}
